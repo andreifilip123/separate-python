@@ -1,16 +1,22 @@
 import asyncio
+import os
 from typing import Union
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-from redis import Redis
+import redis
 from rq import Queue
 
 from .module_example import count_string_len
 from fastapi.responses import RedirectResponse, StreamingResponse
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 app = FastAPI()
-q = Queue(connection=Redis())
+r = redis.from_url(os.getenv("REDIS_URL"))
+q = Queue(connection=r)
 
 
 class Item(BaseModel):
