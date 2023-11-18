@@ -2,15 +2,14 @@ import asyncio
 import os
 from typing import Union
 
-from fastapi import FastAPI
-from pydantic import BaseModel
 import redis
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse, StreamingResponse
+from pydantic import BaseModel
 from rq import Queue
 
 from .module_example import count_string_len
-from fastapi.responses import RedirectResponse, StreamingResponse
-
-from dotenv import load_dotenv
 
 load_dotenv()
 
