@@ -18,8 +18,8 @@ redis_url = os.getenv("REDIS_URL")
 if redis_url:
     r = redis.from_url(redis_url)
 else:
-    print("REDIS_URL not set, skipping Redis operations")
-    r = None
+    print("REDIS_URL not set, using default")
+    r = redis.Redis()
 q = Queue(connection=r)
 
 
