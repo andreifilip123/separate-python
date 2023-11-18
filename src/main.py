@@ -5,7 +5,7 @@ from typing import Union
 import redis
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from rq import Queue
 
@@ -52,7 +52,7 @@ def string_len(string: str):
 
 @app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
-    return StreamingResponse(get_job_status(job_id))
+    return get_job_status(job_id)
 
 
 async def get_job_status(job_id: str):
