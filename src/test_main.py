@@ -5,5 +5,5 @@ from main import app
 client = TestClient(app)
 
 
-def fake_test():
-    assert "true" == "true"
+def test_placeholder():
+    pass
