@@ -22,7 +22,7 @@ jobs:
         python-version: "3.9.18"
         cache: 'pipenv'
     - name: Install pipenv
-      run: pip install pipenv pytest
+      run: pip install pipenv
     - name: Install dependencies
       run: pipenv install
     - name: Lint with flake8
@@ -32,4 +32,4 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
-      run: pytest
+      run: pipevn run pytest
