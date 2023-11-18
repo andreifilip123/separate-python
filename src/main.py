@@ -1,4 +1,3 @@
-import asyncio
 import os
 from typing import Union
 
@@ -52,14 +51,7 @@ def string_len(string: str):
 
 @app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
-    return get_job_status(job_id)
-
-
-async def get_job_status(job_id: str):
     job = q.fetch_job(job_id)
     if job is None:
-        yield "not_found"
-        return
-    while job.get_status() != "finished":
-        await asyncio.sleep(0.1)
-        yield job.get_status()
+        return "Job not found", 404
+    return job.get_status(), 200
