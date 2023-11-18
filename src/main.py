@@ -14,12 +14,7 @@ import module_example
 load_dotenv()
 
 app = FastAPI()
-redis_url = os.getenv("REDIS_URL")
-if redis_url:
-    r = redis.from_url(redis_url)
-else:
-    print("REDIS_URL not set, using default")
-    r = redis.Redis()
+r = redis.from_url(os.getenv("REDIS_URL"))
 q = Queue(connection=r)
 
 
