@@ -9,7 +9,7 @@ from fastapi.responses import RedirectResponse, StreamingResponse
 from pydantic import BaseModel
 from rq import Queue
 
-from module_example import count_string_len
+from .module_example import count_string_len
 
 load_dotenv()
 
