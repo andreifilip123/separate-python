@@ -9,7 +9,7 @@ from fastapi.responses import RedirectResponse, StreamingResponse
 from pydantic import BaseModel
 from rq import Queue
 
-import module_example
+from module_example import count_string_len
 
 load_dotenv()
 
@@ -29,7 +29,7 @@ class Item(BaseModel):
 
 @app.get("/")
 def read_root():
-    result = q.enqueue(module_example.count_string_len, "This is a string")
+    result = q.enqueue(count_string_len, "This is a string")
     return result.get_id()
 
 
@@ -45,7 +45,7 @@ def update_item(item_id: int, item: Item):
 
 @app.get("/string_len/{string}")
 def string_len(string: str):
-    job = q.enqueue(module_example.count_string_len, string)
+    job = q.enqueue(count_string_len, string)
     job_id = job.get_id()
     return RedirectResponse(f"/jobs/{job_id}/status")
 
