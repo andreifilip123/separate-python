@@ -25,7 +25,7 @@ jobs:
       run: pip install pipenv
     - name: Install dependencies
       run: pipenv install --dev
-    - name: Lint with flake8
-      run: pipenv run check ./src
+    - name: Lint with ruff
+      run: pipenv run ruff check ./src
     - name: Test with pytest
       run: pipenv run pytest
