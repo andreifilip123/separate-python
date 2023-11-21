@@ -3,11 +3,12 @@ from typing import Union
 
 import redis
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from rq import Queue
 
+from .lib.aws_wrapper import download_file, upload_file
 from .lib.module_example import count_string_len
 
 load_dotenv()
@@ -40,6 +41,17 @@ def read_item(item_id: int, q: Union[str, None] = None):
 @app.put("/items/{item_id}")
 def update_item(item_id: int, item: Item):
     return {"item_name": item.name, "item_id": item_id}
+
+
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    upload_file(file.filename)
+    return {"filename": file.filename}
+
+
+@app.get("/download/{file_name}")
+def get_download_file(file_name: str):
+    return download_file(file_name)
 
 
 @app.get("/string_len/{string}")

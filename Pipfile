@@ -10,6 +10,8 @@ httpx = "*"
 rq = "*"
 redis = "*"
 ruff = "*"
+boto3 = "*"
+python-multipart = "*"
 
 [dev-packages]
 pytest = "*"
