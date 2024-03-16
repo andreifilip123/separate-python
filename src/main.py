@@ -3,17 +3,27 @@ from typing import Union
 
 import redis
 from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from rq import Queue
 
-from .lib.aws_wrapper import download_file, upload_file
+from .lib.aws_wrapper import download_file
 from .lib.module_example import count_string_len
 
 load_dotenv()
 
+origins = ["http://localhost:3000"]
+
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 if os.getenv("REDIS_URL") is None:
     r = redis.Redis()
 else:
@@ -44,8 +54,9 @@ def update_item(item_id: int, item: Item):
 
 
 @app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile):
-    upload_file(file.filename)
+async def create_upload_file(file: UploadFile = File()):
+    print(file)
+    # upload_file(file.filename)
     return {"filename": file.filename}
 
 
