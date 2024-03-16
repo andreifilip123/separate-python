@@ -49,3 +49,22 @@ def upload_file(file_name):
         logging.error(e)
         return False
     return True
+
+
+def upload_file_obj(file_obj, file_name):
+    """Upload a file to an S3 bucket
+
+    :param file_obj: File obj to upload
+    :return: True if file was uploaded, else False
+    """
+
+    # Use file name as object name
+    object_name = os.path.basename(file_name)
+
+    # Upload the file
+    try:
+        s3.upload_fileobj(file_obj, bucket_name, object_name)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True

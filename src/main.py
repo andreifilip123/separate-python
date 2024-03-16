@@ -10,8 +10,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from rq import Queue
 
-# from .lib.aws_wrapper import upload_file
-from .lib.aws_wrapper import download_file
+from .lib.aws_wrapper import download_file, upload_file_obj
 from .lib.module_example import count_string_len
 
 load_dotenv()
@@ -59,8 +58,10 @@ def update_item(item_id: int, item: Item):
 
 @app.post("/uploadfile/")
 async def create_upload_file(song: UploadFile):
-    print(song)
-    # upload_file(song.filename)
+    try:
+        upload_file_obj(song.file, song.filename)
+    except Exception as e:
+        return {"error": str(e)}
     return {"filename": song.filename}
 
 
