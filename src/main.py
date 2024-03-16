@@ -1,5 +1,6 @@
 import os
 from typing import Union
+from urllib.parse import urlparse
 
 import redis
 from dotenv import load_dotenv
@@ -24,10 +25,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-if os.getenv("REDIS_URL") is None:
+
+if os.environ.get("REDISCLOUD_URL") is None:
     r = redis.Redis()
 else:
-    r = redis.from_url(os.getenv("REDIS_URL"))
+    url = urlparse(os.environ.get("REDISCLOUD_URL"))
+    r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
 q = Queue(connection=r)
 
 
