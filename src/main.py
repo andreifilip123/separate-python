@@ -1,7 +1,7 @@
 from typing import Union
 
 from cuid import cuid
-from fastapi import FastAPI, UploadFile, status
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
@@ -88,8 +88,6 @@ def separate_song(song: UploadFile):
         job_id = enqueue_job(separate_song_parts, unique_filename, file_extension)
         print("Enqueued job", job_id)
         # 4. Return the job ID
-        return RedirectResponse(
-            url=f"/jobs/{job_id}/status", status_code=status.HTTP_303_SEE_OTHER
-        )
+        return {"job_id": job_id, "status": get_job_status(job_id)}
     except Exception as e:
         return {"error": str(e)}
