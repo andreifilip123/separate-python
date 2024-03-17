@@ -35,3 +35,16 @@ def get_job_status(job_id):
     if job is None:
         return "Job not found"
     return job.get_status()
+
+
+def get_job_by_id(job_id):
+    """
+    Get a job by id
+    :param job_id: Job ID
+    :return: Job object
+    """
+
+    job = q.fetch_job(job_id)
+    if job is None:
+        return "Job not found"
+    return job

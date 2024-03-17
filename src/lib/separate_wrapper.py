@@ -48,3 +48,8 @@ def separate_song_parts(file_name, file_extension, model="htdemucs", jobs="1"):
     # Clean up
     print("Cleaning up")
     shutil.rmtree(f"downloads/{file_name}", ignore_errors=True)
+
+    return {
+        "no_vocals": f"{file_name}/no_vocals.{file_extension}",
+        "vocals": f"{file_name}/vocals.{file_extension}",
+    }

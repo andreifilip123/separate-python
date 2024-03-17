@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from .lib.aws_wrapper import download_file, upload_file_obj
 from .lib.module_example import count_string_len
-from .lib.queue_wrapper import enqueue_job, get_job_status
+from .lib.queue_wrapper import enqueue_job, get_job_by_id, get_job_status
 from .lib.separate_wrapper import separate_song_parts
 
 origins = ["http://localhost:3000"]
@@ -68,7 +68,12 @@ def string_len(string: str):
 
 @app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
-    return get_job_status(job_id)
+    job = get_job_by_id(job_id)
+    result = job.latest_result()
+    if result is not None and result.type == result.Type.SUCCESSFUL:
+        return {"status": get_job_status(job_id), "result": result.return_value}
+    else:
+        return {"status": get_job_status(job_id), "result": None}
 
 
 @app.post("/separate")
