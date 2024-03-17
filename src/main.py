@@ -1,19 +1,13 @@
-import os
 from typing import Union
-from urllib.parse import urlparse
 
-import redis
-from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-from rq import Queue
 
 from .lib.aws_wrapper import download_file, upload_file_obj
 from .lib.module_example import count_string_len
-
-load_dotenv()
+from .lib.queue_wrapper import enqueue_job, get_job_status
 
 origins = ["http://localhost:3000"]
 
@@ -26,13 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if os.environ.get("REDISCLOUD_URL") is None:
-    r = redis.Redis()
-else:
-    url = urlparse(os.environ.get("REDISCLOUD_URL"))
-    r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
-q = Queue(connection=r)
-
 
 class Item(BaseModel):
     name: str
@@ -42,7 +29,7 @@ class Item(BaseModel):
 
 @app.get("/")
 def read_root():
-    result = q.enqueue(count_string_len, "This is a string")
+    result = enqueue_job(count_string_len, "This is a string")
     return result.get_id()
 
 
@@ -72,14 +59,21 @@ def get_download_file(file_name: str):
 
 @app.get("/string_len/{string}")
 def string_len(string: str):
-    job = q.enqueue(count_string_len, string)
-    job_id = job.get_id()
+    job_id = enqueue_job(count_string_len, string)
+    print(job_id)
     return RedirectResponse(f"/jobs/{job_id}/status")
 
 
 @app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
-    job = q.fetch_job(job_id)
-    if job is None:
-        return "Job not found", 404
-    return job.get_status(), 200
+    return get_job_status(job_id)
+
+
+@app.post("/separate")
+def separate_song(song: UploadFile):
+    upload_file_obj(song.file, song.filename)
+
+    # job = separate_song_parts.queue(path)
+    # status = job.get_status()
+
+    # return '<a href="/api/jobs/' + job.id + '/status">' + status + "</a>"
