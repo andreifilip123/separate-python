@@ -1,11 +1,13 @@
 from typing import Union
 
-from fastapi import FastAPI, UploadFile
+from cuid import cuid
+from fastapi import FastAPI, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from .lib.aws_wrapper import download_file, upload_file_obj
+from .lib.demucs_wrapper import separate_song_parts
 from .lib.module_example import count_string_len
 from .lib.queue_wrapper import enqueue_job, get_job_status
 
@@ -71,9 +73,23 @@ def job_status(job_id: str):
 
 @app.post("/separate")
 def separate_song(song: UploadFile):
-    upload_file_obj(song.file, song.filename)
-
-    # job = separate_song_parts.queue(path)
-    # status = job.get_status()
-
-    # return '<a href="/api/jobs/' + job.id + '/status">' + status + "</a>"
+    print("Separating song parts", song.filename)
+    # 0. Generate a unique file name
+    unique_filename = cuid()
+    print("unique_filename", unique_filename)
+    # 1. Get file extension
+    file_extension = song.filename.split(".")[-1]
+    print("file_extension", file_extension)
+    try:
+        # 2. Upload the file to S3
+        upload_file_obj(song.file, unique_filename)
+        print("Uploaded file to S3")
+        # 3. Enqueue a job to process the song
+        job_id = enqueue_job(separate_song_parts, unique_filename, file_extension)
+        print("Enqueued job", job_id)
+        # 4. Return the job ID
+        return RedirectResponse(
+            url=f"/jobs/{job_id}/status", status_code=status.HTTP_303_SEE_OTHER
+        )
+    except Exception as e:
+        return {"error": str(e)}

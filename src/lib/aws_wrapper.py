@@ -12,7 +12,7 @@ bucket_name = os.getenv("AWS_BUCKET_NAME")
 download_path = "downloads/"
 
 
-def download_file(file_name):
+def download_file(file_name, file_extension="mp3"):
     """Download a file from an S3 bucket
 
     :param file_name: File to download
@@ -23,7 +23,7 @@ def download_file(file_name):
     # if directory doesn't exist, create it
     if not os.path.exists(download_path):
         os.makedirs(download_path)
-    with open(download_path + file_name, "wb") as f:
+    with open(f"{download_path}/{file_name}.{file_extension}", "wb") as f:
         try:
             s3.download_fileobj(bucket_name, file_name, f)
         except ClientError as e:
