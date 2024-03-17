@@ -7,7 +7,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-s3 = boto3.client("s3")
+s3 = boto3.client(
+    "s3",
+    region_name="eu-central-1",
+    config=boto3.session.Config(signature_version="s3v4"),
+)
 bucket_name = os.getenv("AWS_BUCKET_NAME")
 download_path = "downloads/"
 
@@ -67,3 +71,27 @@ def upload_file_obj(file_obj, file_name):
         logging.error(e)
         return False
     return True
+
+
+def create_presigned_url(object_name, expiration=3600):
+    """Generate a presigned URL to share an S3 object
+
+    :param bucket_name: string
+    :param object_name: string
+    :param expiration: Time in seconds for the presigned URL to remain valid
+    :return: Presigned URL as string. If error, returns None.
+    """
+
+    # Generate a presigned URL for the S3 object
+    try:
+        response = s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket_name, "Key": object_name},
+            ExpiresIn=expiration,
+        )
+    except ClientError as e:
+        logging.error(e)
+        return None
+
+    # The response contains the presigned URL
+    return response
