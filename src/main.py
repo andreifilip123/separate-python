@@ -7,9 +7,9 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from .lib.aws_wrapper import download_file, upload_file_obj
-from .lib.demucs_wrapper import separate_song_parts
 from .lib.module_example import count_string_len
 from .lib.queue_wrapper import enqueue_job, get_job_status
+from .lib.separate_wrapper import separate_song_parts
 
 origins = ["http://localhost:3000"]
 
