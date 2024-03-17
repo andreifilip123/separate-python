@@ -23,7 +23,9 @@ def download_file(file_name, file_extension="mp3"):
     # if directory doesn't exist, create it
     if not os.path.exists(download_path):
         os.makedirs(download_path)
-    with open(f"{download_path}/{file_name}.{file_extension}", "wb") as f:
+    # create directory with file name
+    os.makedirs(f"{download_path}/{file_name}", exist_ok=True)
+    with open(f"{download_path}/{file_name}/original.{file_extension}", "wb") as f:
         try:
             s3.download_fileobj(bucket_name, file_name, f)
         except ClientError as e:
@@ -58,12 +60,9 @@ def upload_file_obj(file_obj, file_name):
     :return: True if file was uploaded, else False
     """
 
-    # Use file name as object name
-    object_name = os.path.basename(file_name)
-
     # Upload the file
     try:
-        s3.upload_fileobj(file_obj, bucket_name, object_name)
+        s3.upload_fileobj(file_obj, bucket_name, file_name)
     except ClientError as e:
         logging.error(e)
         return False
