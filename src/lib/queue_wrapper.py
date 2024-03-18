@@ -5,8 +5,10 @@ from redis import Redis
 from rq import Queue
 
 if environ.get("REDISCLOUD_URL") is None:
+    print("Using local redis")
     r = Redis()
 else:
+    print("Using remote redis")
     url = urlparse(environ.get("REDISCLOUD_URL"))
     r = Redis(host=url.hostname, port=url.port, password=url.password)
 q = Queue(connection=r)
