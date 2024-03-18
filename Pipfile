@@ -3,6 +3,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://download.pytorch.org/whl/cpu"
+verify_ssl = true
+name = "downloadpytorch"
+
 [packages]
 fastapi = "0.110.0"
 uvicorn = {extras = ["standard"], version = "==0.28.0"}
@@ -12,6 +17,8 @@ boto3 = "1.34.64"
 python-multipart = "0.0.9"
 demucs = "4.0.1"
 cuid = "0.4"
+torch = {version = "==2.2.1", index = "downloadpytorch"}
+torchaudio = {version = "==2.2.1", index = "downloadpytorch"}
 
 [requires]
 python_version = "3.9"
