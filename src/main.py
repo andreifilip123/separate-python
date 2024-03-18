@@ -103,4 +103,5 @@ def separate_song(song: UploadFile):
         # 4. Return the job ID
         return {"job_id": job_id, "status": get_job_status(job_id)}
     except Exception as e:
+        print("Error", e)
         return {"error": str(e)}

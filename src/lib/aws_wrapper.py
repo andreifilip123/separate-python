@@ -66,8 +66,11 @@ def upload_file_obj(file_obj, file_name):
 
     # Upload the file
     try:
+        print("Uploading file", file_name, "to bucket", bucket_name)
         s3.upload_fileobj(file_obj, bucket_name, file_name)
+        print("File uploaded")
     except ClientError as e:
+        print("Error uploading file", e)
         logging.error(e)
         return False
     return True
