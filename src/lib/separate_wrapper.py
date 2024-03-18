@@ -26,6 +26,8 @@ def separate_song_parts(file_name, file_extension, model="htdemucs", jobs="1"):
             path,
             "-o",
             output_path,
+            "-d",
+            "cpu",
         ]
     )
     print("Separation complete")
