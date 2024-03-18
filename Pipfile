@@ -19,6 +19,7 @@ demucs = "4.0.1"
 cuid = "0.4"
 torch = {version = "==2.2.1", index = "downloadpytorch"}
 torchaudio = {version = "==2.2.1", index = "downloadpytorch"}
+soundfile = "*"
 
 [requires]
 python_version = "3.9"
