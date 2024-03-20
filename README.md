@@ -18,10 +18,6 @@ This project also requires [redis](https://redis.io/) to be installed and runnin
 The project requires the following environment variables to be set:
 ```bash
 REDIS_URL= # defaults to redis://localhost:6379
-AWS_BUCKET_NAME= # the name of the S3 bucket where the files will be uploaded
-AWS_REGION= # the region of the S3 bucket
-AWS_ACCESS_KEY_ID= # the access key id of the AWS user
-AWS_SECRET_ACCESS_KEY= # the secret access key of the AWS user
 ```
 
 

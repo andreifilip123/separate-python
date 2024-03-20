@@ -1,57 +1,47 @@
-import logging
-import shutil
-
 import demucs.separate
-from botocore.exceptions import ClientError
-
-from .aws_wrapper import download_file, upload_file_obj
+import requests
 
 
-def separate_song_parts(file_name, file_extension, model="htdemucs", jobs="1"):
-    print(f"Separating song parts for {file_name} with model {model} using {jobs} jobs")
-    download_file(file_name)
+def separate_song_parts(file_url: str, unique_id: str, model="htdemucs", jobs="1"):
+    print(f"Separating song parts for {unique_id} with model {model} using {jobs} jobs")
+    file_extension = file_url.split(".")[-1]
 
-    path = f"downloads/{file_name}/original.{file_extension}"
-    output_path = f"downloads/{file_name}/"
+    output_path = f"downloads/{unique_id}/"
 
-    demucs.separate.main(
-        [
-            "-n",
-            model,
-            "--mp3",
-            "-j",
-            jobs,
-            "--two-stems",
-            "vocals",
-            path,
-            "-o",
-            output_path,
-            "-d",
-            "cpu",
-        ]
-    )
+    file_path = f"downloads/{unique_id}.{file_extension}"
+
+    # Download the file
+    r = requests.get(file_url)
+    with open(file_path, 'wb') as outfile:
+        outfile.write(r.content)
+    print("Downloaded the file locally")
+
+    # Create an options array to pass to the separate function
+    options = [
+        "-n",
+        model,
+        "--mp3",
+        "-j",
+        jobs,
+        "--two-stems",
+        "vocals",
+        file_path,
+        "-o",
+        output_path,
+        "-d",
+        "cpu",
+    ]
+
+    if file_extension == "mp3":
+        options.append("--mp3")
+
+    demucs.separate.main(options)
     print("Separation complete")
 
-    no_vocals = f"downloads/{file_name}/htdemucs/original/no_vocals.{file_extension}"
-    vocals = f"downloads/{file_name}/htdemucs/original/vocals.{file_extension}"
-
-    with open(no_vocals, "rb") as data:
-        try:
-            upload_file_obj(data, f"{file_name}/no_vocals.{file_extension}")
-        except ClientError as e:
-            logging.error(e)
-
-    with open(vocals, "rb") as data:
-        try:
-            upload_file_obj(data, f"{file_name}/vocals.{file_extension}")
-        except ClientError as e:
-            logging.error(e)
-
-    # Clean up
-    print("Cleaning up")
-    shutil.rmtree(f"downloads/{file_name}", ignore_errors=True)
+    no_vocals = f"downloads/{unique_id}/htdemucs/{unique_id}/no_vocals.{file_extension}"
+    vocals = f"downloads/{unique_id}/htdemucs/{unique_id}/vocals.{file_extension}"
 
     return {
-        "no_vocals": f"{file_name}/no_vocals.{file_extension}",
-        "vocals": f"{file_name}/vocals.{file_extension}",
+        "no_vocals": no_vocals,
+        "vocals": vocals,
     }
