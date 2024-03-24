@@ -17,11 +17,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
     job = get_job_by_id(job_id)
+    if job is None:
+        return {"status": "Job not found", "result": None}
     result = job.latest_result()
-    if result is not None and result.type == result.Type.SUCCESSFUL:
+    if (
+        result is not None
+        and result.type == result.Type.SUCCESSFUL
+        and result.return_value is not None
+    ):
         no_vocals = result.return_value["no_vocals"]
         vocals = result.return_value["vocals"]
 

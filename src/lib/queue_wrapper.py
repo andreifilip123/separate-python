@@ -10,7 +10,7 @@ if environ.get("REDISCLOUD_URL") is None:
 else:
     print("Using remote redis")
     url = urlparse(environ.get("REDISCLOUD_URL"))
-    r = Redis(host=url.hostname, port=url.port, password=url.password)
+    r = Redis(host=url.hostname, port=url.port, password=url.password)  # type: ignore
 q = Queue(connection=r)
 
 
@@ -48,5 +48,5 @@ def get_job_by_id(job_id):
 
     job = q.fetch_job(job_id)
     if job is None:
-        return "Job not found"
+        return None
     return job
