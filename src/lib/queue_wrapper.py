@@ -11,7 +11,7 @@ else:
     print("Using remote redis")
     url = urlparse(environ.get("REDISCLOUD_URL"))
     r = Redis(host=url.hostname, port=url.port, password=url.password) # type: ignore
-q = Queue(connection=r)
+q = Queue(connection=r, default_timeout=600)
 
 
 def enqueue_job(func, *args):
