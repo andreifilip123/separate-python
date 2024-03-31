@@ -20,17 +20,21 @@ app.add_middleware(
 @app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
     job = get_job_by_id(job_id)
+    response = {
+        "status": get_job_status(job_id),
+        "result": None
+    }
+    if job is None:
+        return response
     result = job.latest_result()
-    if result is not None and result.type == result.Type.SUCCESSFUL:
-        no_vocals = result.return_value["no_vocals"]
-        vocals = result.return_value["vocals"]
+    if result is None or result.return_value is None:
+        return response
+    no_vocals = result.return_value["no_vocals"]
+    vocals = result.return_value["vocals"]
 
-        return {
-            "status": get_job_status(job_id),
-            "result": {"no_vocals": no_vocals, "vocals": vocals},
-        }
-    else:
-        return {"status": get_job_status(job_id), "result": None}
+    response["result"] = {"no_vocals": no_vocals, "vocals": vocals}
+
+    return response
 
 
 class SeparateRequestParams(BaseModel):

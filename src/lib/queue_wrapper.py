@@ -47,6 +47,4 @@ def get_job_by_id(job_id):
     """
 
     job = q.fetch_job(job_id)
-    if job is None:
-        return "Job not found"
     return job
