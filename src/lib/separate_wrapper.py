@@ -1,3 +1,4 @@
+import os
 import demucs.separate
 import requests
 
@@ -9,6 +10,9 @@ def separate_song_parts(file_url: str, unique_id: str, model="htdemucs", jobs="1
     output_path = f"downloads/{unique_id}/"
 
     file_path = f"downloads/{unique_id}.{file_extension}"
+
+    if not os.path.exists("downloads"):
+        os.makedirs("downloads")
 
     # Download the file
     r = requests.get(file_url)
@@ -28,8 +32,6 @@ def separate_song_parts(file_url: str, unique_id: str, model="htdemucs", jobs="1
         file_path,
         "-o",
         output_path,
-        "-d",
-        "cpu",
     ]
 
     if file_extension == "mp3":

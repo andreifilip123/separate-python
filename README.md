@@ -39,11 +39,6 @@ Now, you can run the project:
 pipenv run uvicorn src.main:app --reload
 ```
 
-To run tests locally, run:
-```bash
-pipenv run pytest
-```
-
 To start the queue worker, run:
 ```bash
 pipenv run rq worker
