@@ -1,21 +1,11 @@
 from cuid import cuid
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from .lib.queue_wrapper import enqueue_job, get_job_by_id, get_job_status
 from .lib.separate_wrapper import separate_song_parts
 
-origins = ["http://localhost:3000"]
-
 app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
