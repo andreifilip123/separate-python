@@ -1,14 +1,27 @@
+from os import environ
+
 from cuid import cuid
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
 from .lib.queue_wrapper import enqueue_job, get_job_by_id, get_job_status
 from .lib.separate_wrapper import separate_song_parts
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authentication
+
+
+def api_key_auth(api_key: str = Depends(oauth2_scheme)):
+    if api_key != environ.get("API_KEY"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden"
+        )
+
+
 app = FastAPI()
 
 
-@app.get("/jobs/{job_id}/status")
+@app.get("/jobs/{job_id}/status", dependencies=[Depends(api_key_auth)])
 def job_status(job_id: str):
     job = get_job_by_id(job_id)
     response = {"status": get_job_status(job_id), "result": None}
@@ -29,7 +42,7 @@ class SeparateRequestParams(BaseModel):
     song_url: str
 
 
-@app.post("/separate")
+@app.post("/separate", dependencies=[Depends(api_key_auth)])
 def separate_song(params: SeparateRequestParams):
     unique_id = cuid()
     print("Separating song parts", unique_id)
