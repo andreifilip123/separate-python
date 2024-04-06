@@ -1,6 +1,3 @@
-from os import environ
-from urllib.parse import urlparse
-
 from redis import Redis
 from rq import Queue
 
