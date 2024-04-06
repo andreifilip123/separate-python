@@ -20,6 +20,7 @@ torch = {version = "==2.2.1", index = "downloadpytorch"}
 torchaudio = {version = "==2.2.1", index = "downloadpytorch"}
 soundfile = "*"
 requests = "*"
+fastapi-limiter = "*"
 
 [requires]
 python_version = "3.9"

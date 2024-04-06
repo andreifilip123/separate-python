@@ -2,10 +2,18 @@ from os import environ
 
 from cuid import cuid
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.concurrency import asynccontextmanager
 from fastapi.security import OAuth2PasswordBearer
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
 from pydantic import BaseModel
 
-from .lib.queue_wrapper import enqueue_job, get_job_by_id, get_job_status
+from .lib.queue_wrapper import (
+    enqueue_job,
+    get_job_by_id,
+    get_job_status,
+    redis_connection,
+)
 from .lib.separate_wrapper import separate_song_parts
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authentication
@@ -18,10 +26,20 @@ def api_key_auth(api_key: str = Depends(oauth2_scheme)):
         )
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    await FastAPILimiter.init(redis_connection)
+    yield
+    await FastAPILimiter.close()
 
 
-@app.get("/jobs/{job_id}/status", dependencies=[Depends(api_key_auth)])
+app = FastAPI(
+    lifespan=lifespan,
+    dependencies=[Depends(api_key_auth), Depends(RateLimiter(times=2, seconds=5))],
+)
+
+
+@app.get("/jobs/{job_id}/status")
 def job_status(job_id: str):
     job = get_job_by_id(job_id)
     response = {"status": get_job_status(job_id), "result": None}
@@ -42,7 +60,7 @@ class SeparateRequestParams(BaseModel):
     song_url: str
 
 
-@app.post("/separate", dependencies=[Depends(api_key_auth)])
+@app.post("/separate")
 def separate_song(params: SeparateRequestParams):
     unique_id = cuid()
     print("Separating song parts", unique_id)

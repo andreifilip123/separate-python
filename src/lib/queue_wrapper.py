@@ -13,6 +13,9 @@ else:
     r = Redis(host=url.hostname, port=url.port, password=url.password)  # type: ignore
 q = Queue(connection=r, default_timeout=600)
 
+# export the redis connection
+redis_connection = r
+
 
 def enqueue_job(func, *args):
     """
