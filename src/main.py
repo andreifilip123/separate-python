@@ -21,6 +21,7 @@ def api_key_auth(api_key: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden"
         )
 
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     redis_connection = redis.from_url("redis://localhost:6379", encoding="utf8")
