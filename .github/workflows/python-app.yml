@@ -21,6 +21,8 @@ jobs:
       with:
         python-version: "3.9.18"
         cache: 'pipenv'
+    - name: Install pipenv
+      run: pip install pipenv
     - name: Install dependencies
       run: pipenv install --dev
     - name: Ruff
