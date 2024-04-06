@@ -4,17 +4,8 @@ from urllib.parse import urlparse
 from redis import Redis
 from rq import Queue
 
-if environ.get("REDISCLOUD_URL") is None:
-    print("Using local redis")
-    r = Redis()
-else:
-    print("Using remote redis")
-    url = urlparse(environ.get("REDISCLOUD_URL"))
-    r = Redis(host=url.hostname, port=url.port, password=url.password)  # type: ignore
+r = Redis()
 q = Queue(connection=r, default_timeout=600)
-
-# export the redis connection
-redis_connection = r
 
 
 def enqueue_job(func, *args):

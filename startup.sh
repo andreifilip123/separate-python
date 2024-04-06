@@ -32,4 +32,3 @@ rq_worker_pid=$!
 
 echo "Uvicorn server started with PID: $uvicorn_pid"
 echo "RQ worker started with PID: $rq_worker_pid"
-

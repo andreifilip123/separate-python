@@ -1,19 +1,15 @@
+from contextlib import asynccontextmanager
 from os import environ
 
+import redis.asyncio as redis
 from cuid import cuid
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.concurrency import asynccontextmanager
 from fastapi.security import OAuth2PasswordBearer
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 from pydantic import BaseModel
 
-from .lib.queue_wrapper import (
-    enqueue_job,
-    get_job_by_id,
-    get_job_status,
-    redis_connection,
-)
+from .lib.queue_wrapper import enqueue_job, get_job_by_id, get_job_status
 from .lib.separate_wrapper import separate_song_parts
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authentication
@@ -25,9 +21,9 @@ def api_key_auth(api_key: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden"
         )
 
-
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    redis_connection = redis.from_url("redis://localhost:6379", encoding="utf8")
     await FastAPILimiter.init(redis_connection)
     yield
     await FastAPILimiter.close()
