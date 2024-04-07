@@ -1,17 +1,7 @@
-from os import environ
-from typing import cast
-
 from redis import Redis
 from rq import Queue
 
-if environ.get("REDIS_HOST") is not None and environ.get("REDIS_PORT") is not None:
-    print("Using redis host")
-    host = cast(str, environ.get("REDIS_HOST")) or "localhost"
-    port = str(cast(int, environ.get("REDIS_PORT")) or 6379)
-    r = Redis.from_url("redis://" + host + ":" + port)
-else:
-    print("Using local redis")
-    r = Redis()
+r = Redis()
 q = Queue(connection=r, default_timeout=600)
 
 
