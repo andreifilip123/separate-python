@@ -22,7 +22,6 @@ soundfile = "*"
 requests = "*"
 fastapi-limiter = "*"
 ruff = "*"
-fakeredis = "*"
 
 [requires]
 python_version = "3.9"
