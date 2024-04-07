@@ -1,30 +1,17 @@
 import os
+
 import demucs.separate
 import requests
 
 
 def separate_song_parts(file_url: str, unique_id: str, model="htdemucs", jobs="1"):
     print(f"Separating song parts for {unique_id} with model {model} using {jobs} jobs")
-    file_extension = file_url.split(".")[-1]
-
-    output_path = f"downloads/{unique_id}/"
-
-    file_path = f"downloads/{unique_id}.{file_extension}"
-
-    if not os.path.exists("downloads"):
-        os.makedirs("downloads")
-
-    # Download the file
-    r = requests.get(file_url)
-    with open(file_path, 'wb') as outfile:
-        outfile.write(r.content)
-    print("Downloaded the file locally")
+    file_extension, output_path, file_path = _download_file(file_url, unique_id)
 
     # Create an options array to pass to the separate function
     options = [
         "-n",
         model,
-        "--mp3",
         "-j",
         jobs,
         "--two-stems",
@@ -47,3 +34,21 @@ def separate_song_parts(file_url: str, unique_id: str, model="htdemucs", jobs="1
         "no_vocals": no_vocals,
         "vocals": vocals,
     }
+
+
+def _download_file(file_url, unique_id):
+    file_extension = file_url.split(".")[-1]
+
+    output_path = f"downloads/{unique_id}/"
+
+    file_path = f"downloads/{unique_id}.{file_extension}"
+
+    if not os.path.exists("downloads"):
+        os.makedirs("downloads")
+
+    # Download the file
+    r = requests.get(file_url)
+    with open(file_path, "wb") as outfile:
+        outfile.write(r.content)
+    print("Downloaded the file locally")
+    return file_extension, output_path, file_path
