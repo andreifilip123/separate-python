@@ -1,9 +1,13 @@
 import unittest
+from unittest.mock import patch
+
+import fakeredis
 
 from .queue_wrapper import enqueue_job, get_job_by_id, get_job_status
 
 
 class TestQueueWrapper(unittest.TestCase):
+    @patch("redis_instance", fakeredis.FakeStrictRedis())
     def test_enqueue_job(self):
         # Test case 1: Enqueue a job with a function and arguments
         def add(a, b):
@@ -29,6 +33,7 @@ class TestQueueWrapper(unittest.TestCase):
         self.assertIsNotNone(job_id)
         # Add assertions to check if the job is enqueued correctly
 
+    @patch("redis_instance", fakeredis.FakeStrictRedis())
     def test_get_job_status(self):
         # Test case 1: Get status of an existing job
         job_id = enqueue_job(lambda: None)
@@ -42,6 +47,7 @@ class TestQueueWrapper(unittest.TestCase):
         self.assertEqual(status, "Job not found")
         # Add assertions to check if the status is correct
 
+    @patch("redis_instance", fakeredis.FakeStrictRedis())
     def test_get_job_by_id(self):
         # Test case 1: Get an existing job by id
         job_id = enqueue_job(lambda: None)
