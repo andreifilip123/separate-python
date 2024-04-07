@@ -6,10 +6,9 @@ from rq import Queue
 
 if environ.get("REDIS_HOST") is not None and environ.get("REDIS_PORT") is not None:
     print("Using redis host")
-    r = Redis(
-        host=cast(str, environ.get("REDIS_HOST")),
-        port=cast(int, environ.get("REDIS_PORT")),
-    )
+    host = cast(str, environ.get("REDIS_HOST")) or "localhost"
+    port = str(cast(int, environ.get("REDIS_PORT")) or 6379)
+    r = Redis.from_url("redis://" + host + ":" + port)
 else:
     print("Using local redis")
     r = Redis()
