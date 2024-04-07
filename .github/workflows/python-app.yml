@@ -11,21 +11,36 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.9.18"
-        cache: 'pipenv'
-    - name: Install pipenv
-      run: pip install pipenv
-    - name: Install dependencies
-      run: pipenv install --dev
-    - name: Ruff
-      uses: chartboost/ruff-action@v1
-    - name: Run python unittest
-      run: pipenv run python -m unittest
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9.18"
+          cache: 'pipenv'
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Install dependencies
+        run: pipenv install --dev
+      - name: Ruff
+        uses: chartboost/ruff-action@v1
+      - name: Run python unittest
+        run: pipenv run python -m unittest
+        env:
+          # The hostname used to communicate with the Redis service container
+          REDIS_HOST: redis
+          # The default Redis port
+          REDIS_PORT: 6379
