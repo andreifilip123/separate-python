@@ -1,8 +1,9 @@
 #!/bin/bash
 
 OSTYPE=$(uname)
-existing_uvicorn_pid=$(ps aux | grep 'uvicorn' | grep 'separate-python' | grep -v grep | awk '{print $2}')
-existing_rq_worker_pid=$(ps aux | grep 'rq worker' | grep 'separate-python' | grep -v grep | awk '{print $2}')
+current_folder=${PWD##*/}
+existing_uvicorn_pid=$(ps aux | grep 'uvicorn' | grep $current_folder | grep -v grep | awk '{print $2}')
+existing_rq_worker_pid=$(ps aux | grep 'rq worker' | grep $current_folder | grep -v grep | awk '{print $2}')
 
 killport() {
     lsof -i :$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox} LISTEN | awk '{print $2}' | xargs kill -9
